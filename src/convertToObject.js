@@ -2,26 +2,42 @@
 
 /**
  * @param {string} sourceString
- *
  * @return {object}
  */
 function convertToObject(sourceString) {
   const obj = {};
 
-  sourceString.split('\n').forEach(line => {
-    const trimmed = line.trim();
+  // розділяємо CSS на правила по ;
+  const rules = sourceString.split(';');
 
-    // Пропускаємо порожні рядки або рядки без ":"
-    if (!trimmed || !trimmed.includes(':')) return;
+  rules.forEach((rule) => {
+    // обрізаємо зайві пробіли, таби та переводи рядків
+    const cleaned = rule
+      .replace(/^[\s\t\r\n]+/, '')
+      .replace(/[\s\t\r\n]+$/, '');
 
-    // Розділяємо на ключ і значення по першому ":"
-    const [key, ...rest] = trimmed.split(':');
-    const value = rest.join(':').trim().replace(/;$/, '');
+    if (!cleaned) {
+      return;
+    }
+
+    const [key, ...rest] = cleaned.split(':');
+
+    if (!rest.length) {
+      return;
+    }
+
+    // значення: обрізаємо лише зовнішні пробіли, \t, \r, \n
+    const value = rest
+      .join(':')
+      .replace(/^[ \t\r\n]+/, '')
+      .replace(/[ \t\r\n]+$/, '');
 
     obj[key.trim()] = value;
   });
 
   return obj;
 }
+
+module.exports = convertToObject;
 
 module.exports = convertToObject;
